@@ -124,24 +124,36 @@ bool SolverFDDP::solve(const std::vector<Eigen::VectorXd>& init_xs,
 const Eigen::Vector2d& SolverFDDP::expectedImprovement() {
   dv_ = 0;
   const std::size_t T = this->problem_->get_T();
-  if (!is_feasible_) {
-    // NB: The dimension of vectors xs_try_ and xs_ are T+1, whereas the
-    // dimension of dx_ is T. Here, we are re-using the final element of dx_ for
-    // the computation of the difference at the terminal node. Using the access
-    // iterator back() this re-use of the final element is fine. Cf. the
-    // discussion at https://github.com/loco-3d/crocoddyl/issues/1022
-    problem_->get_terminalModel()->get_state()->diff(xs_try_.back(), xs_.back(),
+  //if (!is_feasible_) {
+  //  // NB: The dimension of vectors xs_try_ and xs_ are T+1, whereas the
+  //  // dimension of dx_ is T. Here, we are re-using the final element of dx_ for
+  //  // the computation of the difference at the terminal node. Using the access
+  //  // iterator back() this re-use of the final element is fine. Cf. the
+  //  // discussion at https://github.com/loco-3d/crocoddyl/issues/1022
+  //  problem_->get_terminalModel()->get_state()->diff(xs_try_.back(), xs_.back(),
+  //                                                   dx_.back());
+  //  fTVxx_p_.noalias() = Vxx_.back() * dx_.back();
+  //  dv_ -= fs_.back().dot(fTVxx_p_);
+  //  const std::vector<boost::shared_ptr<ActionModelAbstract> >& models =
+  //      problem_->get_runningModels();
+  //
+  //  for (std::size_t t = 0; t < T; ++t) {
+  //    models[t]->get_state()->diff(xs_try_[t], xs_[t], dx_[t]);
+  //    fTVxx_p_.noalias() = Vxx_[t] * dx_[t];
+  //    dv_ -= fs_[t].dot(fTVxx_p_);
+  //  }
+  //}
+  problem_->get_terminalModel()->get_state()->diff(xs_try_.back(), xs_.back(),
                                                      dx_.back());
-    fTVxx_p_.noalias() = Vxx_.back() * dx_.back();
-    dv_ -= fs_.back().dot(fTVxx_p_);
-    const std::vector<boost::shared_ptr<ActionModelAbstract> >& models =
-        problem_->get_runningModels();
-
-    for (std::size_t t = 0; t < T; ++t) {
-      models[t]->get_state()->diff(xs_try_[t], xs_[t], dx_[t]);
-      fTVxx_p_.noalias() = Vxx_[t] * dx_[t];
-      dv_ -= fs_[t].dot(fTVxx_p_);
-    }
+  fTVxx_p_.noalias() = Vxx_.back() * dx_.back();
+  dv_ -= fs_.back().dot(fTVxx_p_);
+  const std::vector<boost::shared_ptr<ActionModelAbstract> >& models =
+      problem_->get_runningModels();
+  
+  for (std::size_t t = 0; t < T; ++t) {
+    models[t]->get_state()->diff(xs_try_[t], xs_[t], dx_[t]);
+    fTVxx_p_.noalias() = Vxx_[t] * dx_[t];
+    dv_ -= fs_[t].dot(fTVxx_p_);
   }
   d_[0] = dg_ + dv_;
   d_[1] = dq_ - 2 * dv_;
@@ -152,11 +164,14 @@ void SolverFDDP::updateExpectedImprovement() {
   dg_ = 0;
   dq_ = 0;
   const std::size_t T = this->problem_->get_T();
-  if (!is_feasible_) {
-    dg_ -= Vx_.back().dot(fs_.back());
-    fTVxx_p_.noalias() = Vxx_.back() * fs_.back();
-    dq_ += fs_.back().dot(fTVxx_p_);
-  }
+  // if (!is_feasible_) { // what is the point of this?
+  //   dg_ -= Vx_.back().dot(fs_.back());
+  //   fTVxx_p_.noalias() = Vxx_.back() * fs_.back();
+  //   dq_ += fs_.back().dot(fTVxx_p_);
+  // }
+  dg_ -= Vx_.back().dot(fs_.back());
+  fTVxx_p_.noalias() = Vxx_.back() * fs_.back();
+  dq_ += fs_.back().dot(fTVxx_p_);
   const std::vector<boost::shared_ptr<ActionModelAbstract> >& models =
       problem_->get_runningModels();
   for (std::size_t t = 0; t < T; ++t) {
@@ -165,11 +180,14 @@ void SolverFDDP::updateExpectedImprovement() {
       dg_ += Qu_[t].dot(k_[t]);
       dq_ -= k_[t].dot(Quuk_[t]);
     }
-    if (!is_feasible_) {
-      dg_ -= Vx_[t].dot(fs_[t]);
-      fTVxx_p_.noalias() = Vxx_[t] * fs_[t];
-      dq_ += fs_[t].dot(fTVxx_p_);
-    }
+    // if (!is_feasible_) {
+    //   dg_ -= Vx_[t].dot(fs_[t]);
+    //   fTVxx_p_.noalias() = Vxx_[t] * fs_[t];
+    //   dq_ += fs_[t].dot(fTVxx_p_);
+    // }
+    dg_ -= Vx_[t].dot(fs_[t]);
+    fTVxx_p_.noalias() = Vxx_[t] * fs_[t];
+    dq_ += fs_[t].dot(fTVxx_p_);
   }
 }
 

@@ -107,7 +107,7 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
     dreg_ = init_reg;
   }
   */
-  preg_ = dreg_ = 100.0; // my magic number
+  preg_ = dreg_ = 100; // my magic number
 
   was_feasible_ = false;
   if (zero_upsilon_) {
@@ -131,6 +131,8 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
       try {
         computeDirection(recalcDiff);
       } catch (std::exception& e) {
+        std::cout << "Exception shouldn't happen in compute direction" << std::endl;
+        exit(5);
         recalcDiff = false;
         increaseRegularization();
         if (preg_ == reg_max_) {
@@ -141,13 +143,15 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
       }
       break;
     }
-    updateExpectedImprovement();
-    expectedImprovement();
+    updateExpectedImprovement(); // what is the point of this?
+    expectedImprovement(); // what is the point of this?
 
     // Update the penalty parameter for computing the merit function and its
     // directional derivative For more details see Section 3 of "An Interior
     // Point Algorithm for Large Scale Nonlinear Programming"
     if (hfeas_ != 0 && iter_ != 0) {
+      std::cout << "point of this? 1" << std::endl; // shouldn't happen, don't know why
+      exit(6);
       upsilon_ =
           std::max(upsilon_, (d_[0] + .5 * d_[1]) / ((1 - rho_) * hfeas_));
     }
