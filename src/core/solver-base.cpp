@@ -196,12 +196,14 @@ void SolverAbstract::setCandidate(const std::vector<Eigen::VectorXd>& xs_warm,
   const std::vector<boost::shared_ptr<ActionModelAbstract> >& models =
       problem_->get_runningModels();
   if (xs_warm.size() == 0) {
+    std::cout << "first if setCandidate" << std::endl;
     for (std::size_t t = 0; t < T; ++t) {
       const boost::shared_ptr<ActionModelAbstract>& model = models[t];
       xs_[t] = model->get_state()->zero();
     }
     xs_.back() = problem_->get_terminalModel()->get_state()->zero();
   } else {
+    std::cout << "first else setCandidate" << std::endl;
     if (xs_warm.size() != T + 1) {
       throw_pretty("Warm start state vector has wrong dimension, got "
                    << xs_warm.size() << " expecting " << (T + 1));

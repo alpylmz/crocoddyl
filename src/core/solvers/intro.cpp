@@ -77,25 +77,56 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
   START_PROFILER("SolverIntro::solve");
   if (problem_->is_updated()) {
     resizeData();
+    // we shouldn't come here
+    std::cout << "SolverIntro::solve: problem is updated" << std::endl;
+    exit(1);
   }
   xs_try_[0] =
       problem_->get_x0();  // it is needed in case that init_xs[0] is infeasible
+  // std::cout << "xs_try_[0] = " << xs_try_[0].transpose() << std::endl;
+  // 9.63268e-05 1 2.618 -1.5707 -1 9.26536e-05 2.618 1 0 0 0 0 0 0  0
+  
+  // for some reason the only thing setCandidate does is setting the trajectory's final state = 0
+  //std::cout << "first init_xs: " << init_xs[0].transpose() << std::endl;
+  //std::cout << "first init_xs size: " << init_xs.size() << std::endl; // always 0
   setCandidate(init_xs, init_us, is_feasible);
+  //std::cout << "first init_xs size: " << init_xs.size() << std::endl; // always 0
+  //std::cout << "second init_xs: " << init_xs[0].transpose() << std::endl; // seg fault because size is 0
 
+
+
+  /*
   if (std::isnan(init_reg)) {
+    std::cout << "we should be here" << std::endl;
     preg_ = reg_min_;
     dreg_ = reg_min_;
   } else {
+    std::cout << "Shouldn't be here 1" << std::endl;
+    exit(2);
     preg_ = init_reg;
     dreg_ = init_reg;
   }
+  */
+  preg_ = dreg_ = 100.0; // my magic number
+
   was_feasible_ = false;
   if (zero_upsilon_) {
     upsilon_ = 0.;
   }
+  else{
+    if(upsilon_ != 0){
+      std::cout << "Something going on, upsilon should be zero" << std::endl;
+      std::cout << "upsilon_ = " << upsilon_ << std::endl;
+      exit(3);
+    }
+  }
+  std::cout << "upsilon_ = " << upsilon_ << std::endl;
 
   bool recalcDiff = true;
-  for (iter_ = 0; iter_ < maxiter; ++iter_) {
+  // std::cout << "maxiter: " << maxiter << std::endl;
+  // maxiter is 100 by default, not related with T in python
+  int new_maxiter = 10;
+  for (iter_ = 0; iter_ < new_maxiter; ++iter_) {
     while (true) {
       try {
         computeDirection(recalcDiff);
