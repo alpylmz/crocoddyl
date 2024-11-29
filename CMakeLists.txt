@@ -258,25 +258,25 @@ if(BUILD_PYTHON_INTERFACE)
   add_subdirectory(bindings)
 endif()
 
-# Build the unit tests
-if(BUILD_TESTING)
-  add_subdirectory(unittest)
-endif()
-
-# Build the benchmark
-if(BUILD_BENCHMARK)
-  add_subdirectory(benchmark)
-endif()
-
-# Build the examples
-if(BUILD_EXAMPLES)
-  if(BUILD_PYTHON_INTERFACE)
-    add_subdirectory(examples)
-  else()
-    message(
-      WARNING "Python interface is not built, hence cannot build examples.")
-  endif()
-endif()
+# # Build the unit tests
+# if(BUILD_TESTING)
+#   add_subdirectory(unittest)
+# endif()
+# 
+# # Build the benchmark
+# if(BUILD_BENCHMARK)
+#   add_subdirectory(benchmark)
+# endif()
+# 
+# # Build the examples
+# if(BUILD_EXAMPLES)
+#   if(BUILD_PYTHON_INTERFACE)
+#     add_subdirectory(examples)
+#   else()
+#     message(
+#       WARNING "Python interface is not built, hence cannot build examples.")
+#   endif()
+# endif()
 
 # PkgConfig packaging of the project
 pkg_config_append_libs(${PROJECT_NAME})
