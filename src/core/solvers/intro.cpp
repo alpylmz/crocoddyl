@@ -90,6 +90,10 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
   //std::cout << "first init_xs: " << init_xs[0].transpose() << std::endl;
   //std::cout << "first init_xs size: " << init_xs.size() << std::endl; // always 0
   setCandidate(init_xs, init_us, is_feasible);
+  std::cout << "xs_" << std::endl;
+  for (std::size_t i = 0; i < xs_.size(); ++i) {
+    std::cout << xs_[i].transpose() << std::endl;
+  }
   //std::cout << "first init_xs size: " << init_xs.size() << std::endl; // always 0
   //std::cout << "second init_xs: " << init_xs[0].transpose() << std::endl; // seg fault because size is 0
 
@@ -107,7 +111,8 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
     dreg_ = init_reg;
   }
   */
-  preg_ = dreg_ = 100; // my magic number
+  preg_ = dreg_ = 1.0; // my magic number
+  dreg_ = 2349823784932; // I guess this is not used? Need to check
 
   was_feasible_ = false;
   if (zero_upsilon_) {
@@ -127,7 +132,11 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
   // maxiter is 100 by default, not related with T in python
   int new_maxiter = 10;
   for (iter_ = 0; iter_ < new_maxiter; ++iter_) {
+    std::cout << "first loop" << std::endl;
+    std::cout << "preg_ " << preg_ << std::endl;
+    std::cout << "dreg_ " << dreg_ << std::endl;
     while (true) {
+      std::cout << "first inner loop" << std::endl;
       try {
         computeDirection(recalcDiff);
       } catch (std::exception& e) {
@@ -160,19 +169,23 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
     recalcDiff = false;
     for (std::vector<double>::const_iterator it = alphas_.begin();
          it != alphas_.end(); ++it) {
+          std::cout << "second loop" << std::endl;
       steplength_ = *it;
       try {
         dV_ = tryStep(steplength_);
         dfeas_ = hfeas_ - hfeas_try_;
         dPhi_ = dV_ + upsilon_ * dfeas_;
       } catch (std::exception& e) {
+        std::cout << "Exception shouldn't happen in tryStep" << std::endl;
+        exit(7);
         continue;
       }
       expectedImprovement();
       dVexp_ = steplength_ * (d_[0] + 0.5 * steplength_ * d_[1]);
       dPhiexp_ = dVexp_ + steplength_ * upsilon_ * dfeas_;
       if (dPhiexp_ >= 0) {  // descend direction
-        if (std::abs(d_[0]) < th_grad_ || dPhi_ > th_acceptstep_ * dPhiexp_) {
+        if (std::abs(d_[0]) < th_grad_ || dPhi_ > th_acceptstep_ * dPhiexp_) { // for some reason, in my experiment, I only see this if
+          std::cout << "if num 2" << std::endl;
           was_feasible_ = is_feasible_;
           setCandidate(xs_try_, us_try_, (was_feasible_) || (steplength_ == 1));
           cost_ = cost_try_;
@@ -184,6 +197,8 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
       } else {  // reducing the gaps by allowing a small increment in the cost
                 // value
         if (dV_ > th_acceptnegstep_ * dVexp_) {
+          std::cout << "if num 3" << std::endl;
+          exit(8);
           was_feasible_ = is_feasible_;
           setCandidate(xs_try_, us_try_, (was_feasible_) || (steplength_ == 1));
           cost_ = cost_try_;
@@ -192,22 +207,32 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
           recalcDiff = true;
           break;
         }
+        else{
+          std::cout << "if num 4" << std::endl;
+          exit(9);
+        }
       }
     }
 
-    stoppingCriteria();
+    stoppingCriteria(); // this updates stop_ variable in solver-base.hpp
+    
+    // No callbacks are used for now!
     const std::size_t n_callbacks = callbacks_.size();
     for (std::size_t c = 0; c < n_callbacks; ++c) {
+      std::cout << "Do we have callbacks?" << std::endl;
+      exit(8);
       CallbackAbstract& callback = *callbacks_[c];
       callback(*this);
     }
 
     if (steplength_ > th_stepdec_ && dV_ >= 0.) {
-      decreaseRegularization();
+      decreaseRegularization(); // divides the preg_ by reg_decfactor_, which is 10 by default
     }
     if (steplength_ <= th_stepinc_ || std::abs(d_[1]) <= th_feas_) {
       if (preg_ == reg_max_) {
         STOP_PROFILER("SolverIntro::solve");
+        std::cout << "returning from solve 1" << std::endl;
+        exit(10);
         return false;
       }
       increaseRegularization();
@@ -215,10 +240,13 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
 
     if (is_feasible_ && stop_ < th_stop_) {
       STOP_PROFILER("SolverIntro::solve");
+      std::cout << "returning from solve 2" << std::endl;
+      exit(11);
       return true;
     }
   }
   STOP_PROFILER("SolverIntro::solve");
+  std::cout << "returning from solve 3" << std::endl;
   return false;
 }
 

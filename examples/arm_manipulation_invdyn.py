@@ -83,19 +83,22 @@ def one_step(current_q, current_goal):
     T = 40
     problem = crocoddyl.ShootingProblem(x0, [runningModel] * T, terminalModel)
 
-    # Creating the solver for this OC problem, defining a logger
     solver = crocoddyl.SolverIntro(problem)
-    if WITHPLOT:
-        solver.setCallbacks(
-            [
-                crocoddyl.CallbackVerbose(),
-                crocoddyl.CallbackLogger(),
-            ]
-        )
-    else:
-        solver.setCallbacks([crocoddyl.CallbackVerbose()])
+
+    # I am not using logger for now
+    #### # defining a logger
+    #### if WITHPLOT:
+    ####     solver.setCallbacks(
+    ####         [
+    ####             crocoddyl.CallbackVerbose(),
+    ####             crocoddyl.CallbackLogger(),
+    ####         ]
+    ####     )
+    #### else:
+    ####     solver.setCallbacks([crocoddyl.CallbackVerbose()])
 
     # Solving it with the solver algorithm
+    print("python called solve")
     solver.solve()
 
     return solver.xs
@@ -110,7 +113,7 @@ x0 = np.concatenate([q0, pinocchio.utils.zero(robot_model.nv)])
 
 goal = np.array([0.5, 0.3, 0.45])
 guess_q0 = np.array([0.75, 0.0, 0.45])
-N = 10
+N = 1
 diff = goal - guess_q0
 diff = diff / N
 

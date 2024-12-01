@@ -206,9 +206,9 @@ double SolverDDP::calcDiff() {
   }
   cost_ = problem_->calcDiff(xs_, us_);
 
-  ffeas_ = computeDynamicFeasibility();
-  gfeas_ = computeInequalityFeasibility();
-  hfeas_ = computeEqualityFeasibility();
+  // ffeas_ = computeDynamicFeasibility(); I believe this is not used?
+  // gfeas_ = computeInequalityFeasibility();
+  hfeas_ = computeEqualityFeasibility(); // This is used in the solve function
   STOP_PROFILER("SolverDDP::calcDiff");
   return cost_;
 }
