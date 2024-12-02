@@ -92,6 +92,7 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
   setCandidate(xs_try_, init_us, is_feasible);
   std::cout << "xs_" << std::endl;
   for (std::size_t i = 0; i < xs_.size(); ++i) {
+    xs_[i] = xs_try_[0];
     std::cout << xs_[i].transpose() << std::endl;
   }
   //std::cout << "first init_xs size: " << init_xs.size() << std::endl; // always 0
