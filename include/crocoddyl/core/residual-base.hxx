@@ -41,7 +41,9 @@ ResidualModelAbstractTpl<Scalar>::~ResidualModelAbstractTpl() {}
 template <typename Scalar>
 void ResidualModelAbstractTpl<Scalar>::calc(
     const boost::shared_ptr<ResidualDataAbstract>&,
-    const Eigen::Ref<const VectorXs>&, const Eigen::Ref<const VectorXs>&) {}
+    const Eigen::Ref<const VectorXs>&, const Eigen::Ref<const VectorXs>&) {
+      std::cout << "residualmodelabstracttpl" << std::endl;
+    }
 
 template <typename Scalar>
 void ResidualModelAbstractTpl<Scalar>::calc(

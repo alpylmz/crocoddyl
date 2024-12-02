@@ -139,6 +139,19 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
       std::cout << "first inner loop" << std::endl;
       try {
         computeDirection(recalcDiff);
+        // here, calcDiff works:
+        /*
+        integratedactionmodeleuler
+        controlparametrizationmodelpolyzero
+        fullactuation
+        cost model sum
+        residual cost
+        residualmodelframeplacementtpl
+        residual cost
+        residual cost
+        residualmodelstatetpl
+        constraint model manager
+        */
       } catch (std::exception& e) {
         std::cout << "Exception shouldn't happen in compute direction" << std::endl;
         exit(5);

@@ -79,6 +79,7 @@ template <typename Scalar>
 void ResidualModelStateTpl<Scalar>::calc(
     const boost::shared_ptr<ResidualDataAbstract>& data,
     const Eigen::Ref<const VectorXs>& x, const Eigen::Ref<const VectorXs>&) {
+  std::cout << "residualmodelstatetpl" << std::endl;
   if (static_cast<std::size_t>(x.size()) != state_->get_nx()) {
     throw_pretty("Invalid argument: "
                  << "x has wrong dimension (it should be " +

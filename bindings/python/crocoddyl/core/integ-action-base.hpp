@@ -37,6 +37,7 @@ class IntegratedActionModelAbstract_wrap
   void calc(const boost::shared_ptr<ActionDataAbstract>& data,
             const Eigen::Ref<const Eigen::VectorXd>& x,
             const Eigen::Ref<const Eigen::VectorXd>& u) {
+              std::cout << "integratedactionmodelabstract calc" << std::endl;
     if (static_cast<std::size_t>(x.size()) != state_->get_nx()) {
       throw_pretty("Invalid argument: "
                    << "x has wrong dimension (it should be " +

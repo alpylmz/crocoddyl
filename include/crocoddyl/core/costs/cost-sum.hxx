@@ -92,6 +92,7 @@ template <typename Scalar>
 void CostModelSumTpl<Scalar>::calc(const boost::shared_ptr<CostDataSum>& data,
                                    const Eigen::Ref<const VectorXs>& x,
                                    const Eigen::Ref<const VectorXs>& u) {
+                                    std::cout << "cost model sum" << std::endl;
   if (static_cast<std::size_t>(x.size()) != state_->get_nx()) {
     throw_pretty("Invalid argument: "
                  << "x has wrong dimension (it should be " +
@@ -119,8 +120,9 @@ void CostModelSumTpl<Scalar>::calc(const boost::shared_ptr<CostDataSum>& data,
       assert_pretty(it_m->first == it_d->first,
                     "it doesn't match the cost name between model and data ("
                         << it_m->first << " != " << it_d->first << ")");
-
+      std::cout << "costsum iter calc" << std::endl;
       m_i->cost->calc(d_i, x, u);
+      std::cout << "costsum iter calc done" << std::endl;
       data->cost += m_i->weight * d_i->cost;
     }
   }

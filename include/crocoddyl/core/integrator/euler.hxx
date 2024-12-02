@@ -36,6 +36,7 @@ template <typename Scalar>
 void IntegratedActionModelEulerTpl<Scalar>::calc(
     const boost::shared_ptr<ActionDataAbstract>& data,
     const Eigen::Ref<const VectorXs>& x, const Eigen::Ref<const VectorXs>& u) {
+      std::cout << "integratedactionmodeleuler" << std::endl;
   if (static_cast<std::size_t>(x.size()) != state_->get_nx()) {
     throw_pretty("Invalid argument: "
                  << "x has wrong dimension (it should be " +
@@ -47,21 +48,41 @@ void IntegratedActionModelEulerTpl<Scalar>::calc(
                         std::to_string(nu_) + ")");
   }
   const std::size_t nv = differential_->get_state()->get_nv();
+  std::cout << "integratedactionmodeleuler nv: " << nv << std::endl; // always 6, I guess this is dof?
   Data* d = static_cast<Data*>(data.get());
   const Eigen::VectorBlock<const Eigen::Ref<const VectorXs>, Eigen::Dynamic> v =
       x.tail(nv);
+  std::cout << "integratedactionmodeleuler x: " << x.transpose() << std::endl; // it is the current state, in the first iteration it is in xs_[0]
+  std::cout << "integratedactionmodeleuler v: " << v.transpose() << std::endl; // I guess this is either the speed or the acceleration
 
-  control_->calc(d->control, Scalar(0.), u);
+  control_->calc(d->control, Scalar(0.), u); // d->control->w = u;
+  std::cout << "integratedactionmodeleuler control_->calc done " << std::endl;
+  // differential_calc:
+  // d->differential->xout = d->control->w, which is just u
+  // pinocchio::rnea(pinocchio_, d->pinocchio, q, v, u);
+  // updateGlobalPlacements
+
+  // d->differential->xout = u;
+  // pinocchio::rnea(pinocchio_, d->pinocchio, q, v, u);
   differential_->calc(d->differential, x, d->control->w);
+  std::cout << "integratedactionmodeleuler differential_->calc done " << std::endl;
   const VectorXs& a = d->differential->xout;
+  std::cout << "integratedactionmodeleuler a: " << a << std::endl;
   d->dx.head(nv).noalias() = v * time_step_ + a * time_step2_;
+  std::cout << "integratedactionmodeleuler d->dx.head(nv): " << d->dx.head(nv) << std::endl;
   d->dx.tail(nv).noalias() = a * time_step_;
+  std::cout << "integratedactionmodeleuler d->dx.tail(nv): " << d->dx.tail(nv) << std::endl;
   differential_->get_state()->integrate(x, d->dx, d->xnext);
+  std::cout << "integratedactionmodeleuler differential_->get_state()->integrate done " << std::endl;
   d->cost = time_step_ * d->differential->cost;
+  std::cout << "integratedactionmodeleuler d->cost: " << d->cost << std::endl;
   d->g = d->differential->g;
+  std::cout << "integratedactionmodeleuler d->g: " << d->g << std::endl;
   d->h = d->differential->h;
+  std::cout << "integratedactionmodeleuler d->h: " << d->h << std::endl;
   if (with_cost_residual_) {
     d->r = d->differential->r;
+    std::cout << "integratedactionmodeleuler with_cost_residual_ d->r: " << d->r << std::endl;
   }
 }
 

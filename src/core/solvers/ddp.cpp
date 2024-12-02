@@ -136,7 +136,11 @@ bool SolverDDP::solve(const std::vector<Eigen::VectorXd>& init_xs,
 void SolverDDP::computeDirection(const bool recalcDiff) {
   START_PROFILER("SolverDDP::computeDirection");
   if (recalcDiff) {
+    std::cout << "recalcDiff is true" << std::endl;
     calcDiff();
+  }
+  else{
+    std::cout << "only backwardPass" << std::endl;
   }
   backwardPass();
   STOP_PROFILER("SolverDDP::computeDirection");

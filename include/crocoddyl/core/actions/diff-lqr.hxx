@@ -36,6 +36,7 @@ template <typename Scalar>
 void DifferentialActionModelLQRTpl<Scalar>::calc(
     const boost::shared_ptr<DifferentialActionDataAbstract>& data,
     const Eigen::Ref<const VectorXs>& x, const Eigen::Ref<const VectorXs>& u) {
+      std::cout << "DifferentialActionModelLQR calc" << std::endl;
   if (static_cast<std::size_t>(x.size()) != state_->get_nx()) {
     throw_pretty("Invalid argument: "
                  << "x has wrong dimension (it should be " +

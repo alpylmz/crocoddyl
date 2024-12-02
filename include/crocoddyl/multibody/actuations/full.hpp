@@ -56,6 +56,7 @@ class ActuationModelFullTpl : public ActuationModelAbstractTpl<_Scalar> {
   virtual void calc(const boost::shared_ptr<Data>& data,
                     const Eigen::Ref<const VectorXs>& /*x*/,
                     const Eigen::Ref<const VectorXs>& u) {
+                      std::cout << "fullactuation" << std::endl;
     if (static_cast<std::size_t>(u.size()) != nu_) {
       throw_pretty("Invalid argument: "
                    << "u has wrong dimension (it should be " +

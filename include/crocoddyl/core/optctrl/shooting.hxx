@@ -179,7 +179,10 @@ Scalar ShootingProblemTpl<Scalar>::calc(const std::vector<VectorXs>& xs,
 #pragma omp parallel for num_threads(nthreads_)
 #endif
   for (std::size_t i = 0; i < T_; ++i) {
+    std::cout << "running models cost " << i << std::endl;
+    // running models_[i] is IntegratedActionModelEulerTpl
     running_models_[i]->calc(running_datas_[i], xs[i], us[i]);
+    std::cout << "running models cost " << i << " done" << std::endl;
   }
   terminal_model_->calc(terminal_data_, xs.back());
 

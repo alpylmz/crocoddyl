@@ -49,6 +49,7 @@ template <typename Scalar>
 void ResidualModelControlTpl<Scalar>::calc(
     const boost::shared_ptr<ResidualDataAbstract>& data,
     const Eigen::Ref<const VectorXs>&, const Eigen::Ref<const VectorXs>& u) {
+      std::cout << "residualmodelcontroltpl" << std::endl;
   if (static_cast<std::size_t>(u.size()) != nu_) {
     throw_pretty("Invalid argument: "
                  << "u has wrong dimension (it should be " +

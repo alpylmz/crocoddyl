@@ -130,6 +130,7 @@ template <typename Scalar>
 void DifferentialActionModelContactInvDynamicsTpl<Scalar>::calc(
     const boost::shared_ptr<DifferentialActionDataAbstract>& data,
     const Eigen::Ref<const VectorXs>& x, const Eigen::Ref<const VectorXs>& u) {
+  std::cout << "DifferentialActionModelContactInvDynamics calc" << std::endl;
   if (static_cast<std::size_t>(x.size()) != state_->get_nx()) {
     throw_pretty("Invalid argument: "
                  << "x has wrong dimension (it should be " +

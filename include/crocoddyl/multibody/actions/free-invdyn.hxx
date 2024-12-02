@@ -89,6 +89,7 @@ template <typename Scalar>
 void DifferentialActionModelFreeInvDynamicsTpl<Scalar>::calc(
     const boost::shared_ptr<DifferentialActionDataAbstract>& data,
     const Eigen::Ref<const VectorXs>& x, const Eigen::Ref<const VectorXs>& u) {
+  std::cout << "DifferentialActionModelFreeInvDynamics calc" << std::endl;
   if (static_cast<std::size_t>(x.size()) != state_->get_nx()) {
     throw_pretty("Invalid argument: "
                  << "x has wrong dimension (it should be " +
@@ -107,7 +108,49 @@ void DifferentialActionModelFreeInvDynamicsTpl<Scalar>::calc(
       x.tail(nv);
 
   d->xout = u;
-  pinocchio::rnea(pinocchio_, d->pinocchio, q, v, u);
+
+  std::cout << "pinocchio: " << std::endl;
+
+  d->pinocchio.v[0].setZero();
+  d->pinocchio.a_gf[0] = -pinocchio_.gravity;
+
+  //starting pass1
+  for(int i = 1; i < pinocchio_.njoints; ++i){
+    // Pass1::run(pinocchio_.joints[i], d->pinocchio.joints[i], arg1);
+    // arg1 is arg1(pinocchio_, d->pinocchio, q, v, u);
+
+    pinocchio_.joints[i].calc(d->pinocchio.joints[i], q, v);
+
+    d->pinocchio.liMi[i] = pinocchio_.jointPlacements[i]*d->pinocchio.joints[i].M();
+
+    d->pinocchio.v[i] = d->pinocchio.joints[i].v();
+    if(pinocchio_.parents[i] > 0){
+      d->pinocchio.v[i] = d->pinocchio.liMi[i].actInv(d->pinocchio.v[pinocchio_.parents[i]]);
+    }
+
+    d->pinocchio.a_gf[i] = d->pinocchio.joints[i].c() + (d->pinocchio.v[i] ^ d->pinocchio.joints[i].v());
+    d->pinocchio.a_gf[i] += d->pinocchio.joints[i].S() * pinocchio_.joints[i].jointVelocitySelector(u);
+    d->pinocchio.a_gf[i] += d->pinocchio.liMi[i].actInv(d->pinocchio.a_gf[pinocchio_.parents[i]]);
+
+    pinocchio_.inertias[i].__mult__(d->pinocchio.v[i], d->pinocchio.h[i]);
+    pinocchio_.inertias[i].__mult__(d->pinocchio.a_gf[i], d->pinocchio.f[i]);
+    d->pinocchio.f[i] += d->pinocchio.v[i].cross(d->pinocchio.h[i]);
+  }
+
+  //starting pass2
+  for(int i = pinocchio_.njoints - 1; i > 0; --i){
+    // Pass2::run(pinocchio_.joints[i], d->pinocchio.joints[i], arg2);
+    // arg2 is arg2(pinocchio_, d->pinocchio);
+
+    pinocchio_.joints[i].jointVelocitySelector(d->pinocchio.tau) = d->pinocchio.joints[i].S().transpose() * d->pinocchio.f[i];
+    if(pinocchio_.parents[i] > 0){
+      d->pinocchio.f[pinocchio_.parents[i]] += d->pinocchio.liMi[i].act(d->pinocchio.f[i]);
+    }
+  }
+
+
+  // model, data, q, v, a
+  //pinocchio::rnea(pinocchio_, d->pinocchio, q, v, u);
   pinocchio::updateGlobalPlacements(pinocchio_, d->pinocchio);
   actuation_->commands(d->multibody.actuation, x, d->pinocchio.tau);
   d->multibody.joint->a = u;

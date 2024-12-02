@@ -53,6 +53,7 @@ template <typename Scalar>
 void ResidualModelFramePlacementTpl<Scalar>::calc(
     const boost::shared_ptr<ResidualDataAbstract>& data,
     const Eigen::Ref<const VectorXs>&, const Eigen::Ref<const VectorXs>&) {
+      std::cout << "residualmodelframeplacementtpl" << std::endl;
   Data* d = static_cast<Data*>(data.get());
 
   // Compute the frame placement w.r.t. the reference frame

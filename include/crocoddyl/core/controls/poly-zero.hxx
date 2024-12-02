@@ -21,6 +21,7 @@ template <typename Scalar>
 void ControlParametrizationModelPolyZeroTpl<Scalar>::calc(
     const boost::shared_ptr<ControlParametrizationDataAbstract>& data,
     const Scalar, const Eigen::Ref<const VectorXs>& u) const {
+      std::cout << "controlparametrizationmodelpolyzero" << std::endl;
   if (static_cast<std::size_t>(u.size()) != nu_) {
     throw_pretty("Invalid argument: "
                  << "u has wrong dimension (it should be " +
