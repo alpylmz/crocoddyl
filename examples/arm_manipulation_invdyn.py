@@ -22,10 +22,15 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 def one_step(current_q, current_goal):
     # First, let's load create the state and actuation models
-    kinova = example_robot_data.load("kinova")
+    kinova = example_robot_data.load("panda")
+    print("kinova = ", kinova)
     robot_model = kinova.model
+    print("robot_model = ", robot_model)
     state = crocoddyl.StateMultibody(robot_model)
+    print("state = ", state)
     actuation = crocoddyl.ActuationModelFull(state)
+    print("actuation = ", actuation)
+    print(actuation)
     # q0 = kinova.model.referenceConfigurations["arm_up"]
     q0 = current_q
     # x0 = np.concatenate([q0, pinocchio.utils.zero(robot_model.nv)])
@@ -45,7 +50,7 @@ def one_step(current_q, current_goal):
     # goal cost. First, let's create the common cost functions.
     framePlacementResidual = crocoddyl.ResidualModelFramePlacement(
         state,
-        robot_model.getFrameId("j2s6s200_end_effector"),
+        robot_model.getFrameId("panda_link6"),
         pinocchio.SE3(np.eye(3), current_goal),
         nu,
     )
@@ -80,7 +85,7 @@ def one_step(current_q, current_goal):
 
     # For this optimal control problem, we define 100 knots (or running action
     # models) plus a terminal knot
-    T = 1
+    T = 5
     problem = crocoddyl.ShootingProblem(x0, [runningModel] * T, terminalModel)
 
     solver = crocoddyl.SolverIntro(problem)
@@ -105,16 +110,22 @@ def one_step(current_q, current_goal):
     return solver.xs
 
 
-kinova = example_robot_data.load("kinova")
+kinova = example_robot_data.load("panda")
 robot_model = kinova.model
 state = crocoddyl.StateMultibody(robot_model)
 actuation = crocoddyl.ActuationModelFull(state)
-q0 = kinova.model.referenceConfigurations["arm_up"]
+# q0 = kinova.model.referenceConfigurations["arm_up"]
+q0 = [-1.7935987837186267, -1.59100425037732, -0.03295082534947273, -2.206859679378054, 0.053584024206261, 0.600290502125782
+  , 0.61800000e+00,  1.00000000e+00,
+  0.00000000e+00, 0, 0, 0]
+print("q0 = ", q0)
 x0 = np.concatenate([q0, pinocchio.utils.zero(robot_model.nv)])
+print("x0 = ", x0)
+x0 = x0[:-3]
 
-goal = np.array([0.4, 0.2, 0.45])
-guess_q0 = np.array([0.5, 0.0, 0.45])
-N = 500
+goal = np.array([0.5, 0.3, 0.4])
+guess_q0 = np.array([1.0, 0.0, 0.5])
+N = 5
 diff = goal - guess_q0
 diff = diff / N
 

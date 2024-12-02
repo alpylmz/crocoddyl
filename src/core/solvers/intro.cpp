@@ -111,7 +111,7 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
     dreg_ = init_reg;
   }
   */
-  preg_ = dreg_ = 1.0; // my magic number
+  preg_ = dreg_ = 0.01; // my magic number
   dreg_ = 2349823784932; // I guess this is not used? Need to check
 
   was_feasible_ = false;
@@ -245,6 +245,7 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
       if (preg_ == reg_max_) {
         STOP_PROFILER("SolverIntro::solve");
         std::cout << "returning from solve 1" << std::endl;
+        continue;
         exit(10);
         return false;
       }
@@ -254,6 +255,7 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
     if (is_feasible_ && stop_ < th_stop_) {
       STOP_PROFILER("SolverIntro::solve");
       std::cout << "returning from solve 2" << std::endl;
+      continue;
       exit(11);
       return true;
     }

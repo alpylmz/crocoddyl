@@ -104,7 +104,7 @@ class DisplayAbstract(ABC):
                         self.setVisibility(forceName, False)
                         self.setVisibility(coneName, False)
                 self.robot.display(x[: self.robot.nq])
-                time.sleep(0.01)
+                time.sleep(0.1)
 
     def init(self, solver):
         frameNames, thrusters = [], []

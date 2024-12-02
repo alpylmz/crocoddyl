@@ -14,6 +14,8 @@
 
 #include "crocoddyl/core/constraints/residual.hpp"
 
+#include <typeinfo>
+
 namespace crocoddyl {
 
 template <typename Scalar>
@@ -125,19 +127,31 @@ void DifferentialActionModelFreeInvDynamicsTpl<Scalar>::calc(
   for(int i = 1; i < pinocchio_.njoints; ++i){
     // Pass1::run(pinocchio_.joints[i], d->pinocchio.joints[i], arg1);
     // arg1 is arg1(pinocchio_, d->pinocchio, q, v, u);
+    std::cout << "d->pinocchio.joints[i].M() 1:" << d->pinocchio.joints[i].M() << std::endl;
 
     pinocchio_.joints[i].calc(d->pinocchio.joints[i], q, v);
+    std::cout << pinocchio_.joints[i].derived().classname() << std::endl;
+
+
+    std::cout << "pinocchio_.jointPlacements[i]: " << pinocchio_.jointPlacements[i] << std::endl;
+    std::cout << "d->pinocchio.joints[i].M() 2:" << d->pinocchio.joints[i].M() << std::endl;
 
     d->pinocchio.liMi[i] = pinocchio_.jointPlacements[i]*d->pinocchio.joints[i].M();
+    std::cout << "d->pinocchio.liMi[i]: " << d->pinocchio.liMi[i] << std::endl;
 
     d->pinocchio.v[i] = d->pinocchio.joints[i].v();
+    std::cout << "d->pinocchio.v[i]: " << d->pinocchio.v[i] << std::endl;
     if(pinocchio_.parents[i] > 0){
       d->pinocchio.v[i] = d->pinocchio.liMi[i].actInv(d->pinocchio.v[pinocchio_.parents[i]]);
+      std::cout << "d->pinocchio.v[i]: " << d->pinocchio.v[i] << std::endl;
     }
 
     d->pinocchio.a_gf[i] = d->pinocchio.joints[i].c() + (d->pinocchio.v[i] ^ d->pinocchio.joints[i].v());
+    std::cout << "d->pinocchio.a_gf[i] 1: " << d->pinocchio.a_gf[i] << std::endl;
     d->pinocchio.a_gf[i] += d->pinocchio.joints[i].S() * pinocchio_.joints[i].jointVelocitySelector(u);
+    std::cout << "d->pinocchio.a_gf[i] 2: " << d->pinocchio.a_gf[i] << std::endl;
     d->pinocchio.a_gf[i] += d->pinocchio.liMi[i].actInv(d->pinocchio.a_gf[pinocchio_.parents[i]]);
+    std::cout << "d->pinocchio.a_gf[i] 3: " << d->pinocchio.a_gf[i] << std::endl;
 
     pinocchio_.inertias[i].__mult__(d->pinocchio.v[i], d->pinocchio.h[i]);
     pinocchio_.inertias[i].__mult__(d->pinocchio.a_gf[i], d->pinocchio.f[i]);
