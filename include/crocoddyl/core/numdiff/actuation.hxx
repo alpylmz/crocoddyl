@@ -127,6 +127,7 @@ void ActuationModelNumDiffTpl<Scalar>::commands(
     const boost::shared_ptr<ActuationDataAbstract>& data,
     const Eigen::Ref<const VectorXs>& x,
     const Eigen::Ref<const VectorXs>& tau) {
+  std::cout << "ActuationModelNumDiffTpl<Scalar>::commands" << std::endl;
   if (static_cast<std::size_t>(x.size()) != model_->get_state()->get_nx()) {
     throw_pretty("Invalid argument: "
                  << "x has wrong dimension (it should be " +

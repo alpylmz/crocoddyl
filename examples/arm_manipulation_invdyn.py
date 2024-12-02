@@ -80,7 +80,7 @@ def one_step(current_q, current_goal):
 
     # For this optimal control problem, we define 100 knots (or running action
     # models) plus a terminal knot
-    T = 3
+    T = 1
     problem = crocoddyl.ShootingProblem(x0, [runningModel] * T, terminalModel)
 
     solver = crocoddyl.SolverIntro(problem)
@@ -98,8 +98,9 @@ def one_step(current_q, current_goal):
     ####     solver.setCallbacks([crocoddyl.CallbackVerbose()])
 
     # Solving it with the solver algorithm
-    print("python called solve")
+    print("python called solve\n\n\n", flush=True)
     solver.solve()
+    print("python done solve\n\n\n", flush=True)
 
     return solver.xs
 
@@ -113,15 +114,18 @@ x0 = np.concatenate([q0, pinocchio.utils.zero(robot_model.nv)])
 
 goal = np.array([0.4, 0.2, 0.45])
 guess_q0 = np.array([0.5, 0.0, 0.45])
-N = 5
+N = 500
 diff = goal - guess_q0
 diff = diff / N
 
 curr_goal = guess_q0 + diff
+print("x0 = ", x0, flush=True)
 xs = one_step(x0, curr_goal)
+
 all_xs = []
 all_xs = all_xs + [x for x in xs]
 print("xs = ", xs)
+
 xs = xs[-1]
 
 for i in range(N-1):

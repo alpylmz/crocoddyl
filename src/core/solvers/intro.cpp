@@ -89,7 +89,7 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
   // for some reason the only thing setCandidate does is setting the trajectory's final state = 0
   //std::cout << "first init_xs: " << init_xs[0].transpose() << std::endl;
   //std::cout << "first init_xs size: " << init_xs.size() << std::endl; // always 0
-  setCandidate(init_xs, init_us, is_feasible);
+  setCandidate(xs_try_, init_us, is_feasible);
   std::cout << "xs_" << std::endl;
   for (std::size_t i = 0; i < xs_.size(); ++i) {
     std::cout << xs_[i].transpose() << std::endl;
@@ -130,7 +130,7 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
   bool recalcDiff = true;
   // std::cout << "maxiter: " << maxiter << std::endl;
   // maxiter is 100 by default, not related with T in python
-  int new_maxiter = 10;
+  int new_maxiter = 1; // 10 is better, but this also gets close to the goal without crazy movements
   for (iter_ = 0; iter_ < new_maxiter; ++iter_) {
     std::cout << "first loop" << std::endl;
     std::cout << "preg_ " << preg_ << std::endl;

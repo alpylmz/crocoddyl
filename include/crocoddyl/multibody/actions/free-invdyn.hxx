@@ -114,6 +114,13 @@ void DifferentialActionModelFreeInvDynamicsTpl<Scalar>::calc(
   d->pinocchio.v[0].setZero();
   d->pinocchio.a_gf[0] = -pinocchio_.gravity;
 
+  std::cout << "d->pinocchio.v[0]: " << d->pinocchio.v[0] << std::endl;
+  std::cout << "d->pinocchio.a_gf[0]: " << d->pinocchio.a_gf[0] << std::endl;
+
+  std::cout << "pinocchio_.njoints: " << pinocchio_.njoints << std::endl;
+  std::cout << "q: " << q.transpose() << std::endl;
+  std::cout << "v: " << v.transpose() << std::endl;
+
   //starting pass1
   for(int i = 1; i < pinocchio_.njoints; ++i){
     // Pass1::run(pinocchio_.joints[i], d->pinocchio.joints[i], arg1);
@@ -148,14 +155,23 @@ void DifferentialActionModelFreeInvDynamicsTpl<Scalar>::calc(
     }
   }
 
+  // updateGlobalPlacements
+  for(int i = 1; i < pinocchio_.njoints; ++i){
+    if(pinocchio_.parents[i] > 0){
+      d->pinocchio.oMi[i] = d->pinocchio.oMi[pinocchio_.parents[i]] * d->pinocchio.liMi[i];
+    }
+    else{
+      d->pinocchio.oMi[i] = d->pinocchio.liMi[i];
+    }
+  }
 
   // model, data, q, v, a
   //pinocchio::rnea(pinocchio_, d->pinocchio, q, v, u);
-  pinocchio::updateGlobalPlacements(pinocchio_, d->pinocchio);
-  actuation_->commands(d->multibody.actuation, x, d->pinocchio.tau);
+  //pinocchio::updateGlobalPlacements(pinocchio_, d->pinocchio);
+  actuation_->commands(d->multibody.actuation, x, d->pinocchio.tau); // d->multibody.actuation->u = d->pinocchio.tau;
   d->multibody.joint->a = u;
   d->multibody.joint->tau = d->multibody.actuation->u;
-  actuation_->calc(d->multibody.actuation, x, d->multibody.joint->tau);
+  actuation_->calc(d->multibody.actuation, x, d->multibody.joint->tau); // d->multibody.actuation->tau = d->multibody.joint->tau;
   costs_->calc(d->costs, x, u);
   d->cost = d->costs->cost;
   d->constraints->resize(this, d);

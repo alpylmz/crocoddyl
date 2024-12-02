@@ -91,6 +91,7 @@ class ActuationModelFullTpl : public ActuationModelAbstractTpl<_Scalar> {
   virtual void commands(const boost::shared_ptr<Data>& data,
                         const Eigen::Ref<const VectorXs>&,
                         const Eigen::Ref<const VectorXs>& tau) {
+    std::cout << "fullactuation commands" << std::endl;
     if (static_cast<std::size_t>(tau.size()) != nu_) {
       throw_pretty("Invalid argument: "
                    << "tau has wrong dimension (it should be " +

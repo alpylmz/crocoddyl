@@ -54,7 +54,7 @@ void IntegratedActionModelEulerTpl<Scalar>::calc(
       x.tail(nv);
   std::cout << "integratedactionmodeleuler x: " << x.transpose() << std::endl; // it is the current state, in the first iteration it is in xs_[0]
   std::cout << "integratedactionmodeleuler v: " << v.transpose() << std::endl; // I guess this is either the speed or the acceleration
-
+  std::cout << "integratedactionmodeleuler u: " << u.transpose() << std::endl; // it is the control input, in the first iteration it is in us_[0]
   control_->calc(d->control, Scalar(0.), u); // d->control->w = u;
   std::cout << "integratedactionmodeleuler control_->calc done " << std::endl;
   // differential_calc:
