@@ -57,13 +57,14 @@ def one_step(current_q, current_goal):
     uResidual = crocoddyl.ResidualModelJointEffort(state, actuation, nu)
     xResidual = crocoddyl.ResidualModelState(state, x0, nu)
     goalTrackingCost = crocoddyl.CostModelResidual(state, framePlacementResidual)
-    xRegCost = crocoddyl.CostModelResidual(state, xResidual)
-    uRegCost = crocoddyl.CostModelResidual(state, uResidual)
+    # xRegCost = crocoddyl.CostModelResidual(state, xResidual)
+    # uRegCost = crocoddyl.CostModelResidual(state, uResidual)
 
     # Then let's added the running and terminal cost functions
     runningCostModel.addCost("gripperPose", goalTrackingCost, 1)
-    runningCostModel.addCost("xReg", xRegCost, 1e-1)
-    runningCostModel.addCost("uReg", uRegCost, 1e-1)
+    # regularization cost is removed for simplicity
+    # runningCostModel.addCost("xReg", xRegCost, 1e-1)
+    # runningCostModel.addCost("uReg", uRegCost, 1e-1)
     terminalCostModel.addCost("gripperPose", goalTrackingCost, 1e3)
 
     # Next, we need to create an action model for running and terminal knots. The
@@ -122,6 +123,8 @@ print("q0 = ", q0)
 x0 = np.concatenate([q0, pinocchio.utils.zero(robot_model.nv)])
 print("x0 = ", x0)
 x0 = x0[:-3]
+x0 = x0[:-3]
+print("x00 = ", x0)
 
 goal = np.array([0.5, 0.3, 0.4])
 guess_q0 = np.array([1.0, 0.0, 0.5])
