@@ -32,10 +32,16 @@ void CostModelResidualTpl<Scalar>::calc(
     const Eigen::Ref<const VectorXs>& x, const Eigen::Ref<const VectorXs>& u) {
       std::cout << "residual cost" << std::endl;
   // Compute the cost residual
+  std::cout << "residual_->calc" << std::endl;
   residual_->calc(data->residual, x, u);
+  std::cout << "x: " << x << std::endl;
+  std::cout << "u: " << u << std::endl;
+  std::cout << "residual_->calc done" << std::endl;
 
   // Compute the cost
+  std::cout << "activation_->calc" << std::endl;
   activation_->calc(data->activation, data->residual->r);
+  std::cout << "activation_->calc done" << std::endl;
   data->cost = data->activation->a_value;
 }
 

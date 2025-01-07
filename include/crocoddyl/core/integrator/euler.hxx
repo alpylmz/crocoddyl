@@ -53,7 +53,7 @@ void IntegratedActionModelEulerTpl<Scalar>::calc(
   const Eigen::VectorBlock<const Eigen::Ref<const VectorXs>, Eigen::Dynamic> v =
       x.tail(nv);
   std::cout << "integratedactionmodeleuler x: " << x.transpose() << std::endl; // it is the current state, in the first iteration it is in xs_[0]
-  std::cout << "integratedactionmodeleuler v: " << v.transpose() << std::endl; // I guess this is either the speed or the acceleration
+  std::cout << "integratedactionmodeleuler v: " << v.transpose() << std::endl; // speed
   std::cout << "integratedactionmodeleuler u: " << u.transpose() << std::endl; // it is the control input, in the first iteration it is in us_[0]
   control_->calc(d->control, Scalar(0.), u); // d->control->w = u;
   std::cout << "integratedactionmodeleuler control_->calc done " << std::endl;
@@ -64,7 +64,9 @@ void IntegratedActionModelEulerTpl<Scalar>::calc(
 
   // d->differential->xout = u;
   // pinocchio::rnea(pinocchio_, d->pinocchio, q, v, u);
+  std::cout << "integratedactionmodeleuler differential_ type: " << boost::core::demangle(typeid(*differential_).name()) << std::endl;
   differential_->calc(d->differential, x, d->control->w);
+  // print type of differential_
   std::cout << "integratedactionmodeleuler differential_->calc done " << std::endl;
   const VectorXs& a = d->differential->xout;
   std::cout << "integratedactionmodeleuler a: " << a << std::endl;

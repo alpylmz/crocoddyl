@@ -110,86 +110,41 @@ void DifferentialActionModelFreeInvDynamicsTpl<Scalar>::calc(
       x.tail(nv);
 
   d->xout = u;
+  pinocchio::rnea(pinocchio_, d->pinocchio, q, v, u);
+  
 
-  std::cout << "pinocchio: " << std::endl;
-
-  d->pinocchio.v[0].setZero();
-  d->pinocchio.a_gf[0] = -pinocchio_.gravity;
-
-  std::cout << "d->pinocchio.v[0]: " << d->pinocchio.v[0] << std::endl;
-  std::cout << "d->pinocchio.a_gf[0]: " << d->pinocchio.a_gf[0] << std::endl;
-
-  std::cout << "pinocchio_.njoints: " << pinocchio_.njoints << std::endl;
-  std::cout << "q: " << q.transpose() << std::endl;
-  std::cout << "v: " << v.transpose() << std::endl;
-
-  //starting pass1
-  for(int i = 1; i < pinocchio_.njoints; ++i){
-    // Pass1::run(pinocchio_.joints[i], d->pinocchio.joints[i], arg1);
-    // arg1 is arg1(pinocchio_, d->pinocchio, q, v, u);
-    std::cout << "d->pinocchio.joints[i].M() 1:" << d->pinocchio.joints[i].M() << std::endl;
-
-    pinocchio_.joints[i].calc(d->pinocchio.joints[i], q, v);
-    std::cout << pinocchio_.joints[i].derived().classname() << std::endl;
-
-
-    std::cout << "pinocchio_.jointPlacements[i]: " << pinocchio_.jointPlacements[i] << std::endl;
-    std::cout << "d->pinocchio.joints[i].M() 2:" << d->pinocchio.joints[i].M() << std::endl;
-
-    d->pinocchio.liMi[i] = pinocchio_.jointPlacements[i]*d->pinocchio.joints[i].M();
-    std::cout << "d->pinocchio.liMi[i]: " << d->pinocchio.liMi[i] << std::endl;
-
-    d->pinocchio.v[i] = d->pinocchio.joints[i].v();
-    std::cout << "d->pinocchio.v[i]: " << d->pinocchio.v[i] << std::endl;
-    if(pinocchio_.parents[i] > 0){
-      d->pinocchio.v[i] = d->pinocchio.liMi[i].actInv(d->pinocchio.v[pinocchio_.parents[i]]);
-      std::cout << "d->pinocchio.v[i]: " << d->pinocchio.v[i] << std::endl;
-    }
-
-    d->pinocchio.a_gf[i] = d->pinocchio.joints[i].c() + (d->pinocchio.v[i] ^ d->pinocchio.joints[i].v());
-    std::cout << "d->pinocchio.a_gf[i] 1: " << d->pinocchio.a_gf[i] << std::endl;
-    d->pinocchio.a_gf[i] += d->pinocchio.joints[i].S() * pinocchio_.joints[i].jointVelocitySelector(u);
-    std::cout << "d->pinocchio.a_gf[i] 2: " << d->pinocchio.a_gf[i] << std::endl;
-    d->pinocchio.a_gf[i] += d->pinocchio.liMi[i].actInv(d->pinocchio.a_gf[pinocchio_.parents[i]]);
-    std::cout << "d->pinocchio.a_gf[i] 3: " << d->pinocchio.a_gf[i] << std::endl;
-
-    pinocchio_.inertias[i].__mult__(d->pinocchio.v[i], d->pinocchio.h[i]);
-    pinocchio_.inertias[i].__mult__(d->pinocchio.a_gf[i], d->pinocchio.f[i]);
-    d->pinocchio.f[i] += d->pinocchio.v[i].cross(d->pinocchio.h[i]);
-  }
-
-  //starting pass2
-  for(int i = pinocchio_.njoints - 1; i > 0; --i){
-    // Pass2::run(pinocchio_.joints[i], d->pinocchio.joints[i], arg2);
-    // arg2 is arg2(pinocchio_, d->pinocchio);
-
-    pinocchio_.joints[i].jointVelocitySelector(d->pinocchio.tau) = d->pinocchio.joints[i].S().transpose() * d->pinocchio.f[i];
-    if(pinocchio_.parents[i] > 0){
-      d->pinocchio.f[pinocchio_.parents[i]] += d->pinocchio.liMi[i].act(d->pinocchio.f[i]);
-    }
-  }
-
-  // updateGlobalPlacements
-  for(int i = 1; i < pinocchio_.njoints; ++i){
-    if(pinocchio_.parents[i] > 0){
-      d->pinocchio.oMi[i] = d->pinocchio.oMi[pinocchio_.parents[i]] * d->pinocchio.liMi[i];
-    }
-    else{
-      d->pinocchio.oMi[i] = d->pinocchio.liMi[i];
-    }
-  }
+  //pinocchio::updateGlobalPlacements(pinocchio_, d->pinocchio);
+  /////// updateGlobalPlacements
+  /////for(int i = 1; i < pinocchio_.njoints; ++i){
+  /////  if(pinocchio_.parents[i] > 0){
+  /////    d->pinocchio.oMi[i] = d->pinocchio.oMi[pinocchio_.parents[i]] * d->pinocchio.liMi[i];
+  /////  }
+  /////  else{
+  /////    d->pinocchio.oMi[i] = d->pinocchio.liMi[i];
+  /////  }
+  /////}
 
   // model, data, q, v, a
   //pinocchio::rnea(pinocchio_, d->pinocchio, q, v, u);
   //pinocchio::updateGlobalPlacements(pinocchio_, d->pinocchio);
-  actuation_->commands(d->multibody.actuation, x, d->pinocchio.tau); // d->multibody.actuation->u = d->pinocchio.tau;
+  //actuation_->commands(d->multibody.actuation, x, d->pinocchio.tau); // d->multibody.actuation->u = d->pinocchio.tau;
+  d->multibody.actuation->u = d->pinocchio.tau;
   d->multibody.joint->a = u;
   d->multibody.joint->tau = d->multibody.actuation->u;
-  actuation_->calc(d->multibody.actuation, x, d->multibody.joint->tau); // d->multibody.actuation->tau = d->multibody.joint->tau;
+  //actuation_->calc(d->multibody.actuation, x, d->multibody.joint->tau); // d->multibody.actuation->tau = d->multibody.joint->tau;
+  d->multibody.actuation->tau = d->multibody.joint->tau;
+  std::cout << "Starting costs_->calc" << std::endl;
   costs_->calc(d->costs, x, u);
+  std::cout << "Finished costs_->calc" << std::endl;
   d->cost = d->costs->cost;
+  std::cout << "Starting constraints_->resize" << std::endl;
+  // print constraints's type
+  std::cout << "constraints_ type: " << boost::core::demangle(typeid(constraints_).name()) << std::endl;
   d->constraints->resize(this, d);
+  std::cout << "Finished constraints_->resize" << std::endl;
+  std::cout << "Starting constraints_->calc" << std::endl;
   constraints_->calc(d->constraints, x, u);
+  std::cout << "Finished constraints_->calc" << std::endl;
 }
 
 template <typename Scalar>

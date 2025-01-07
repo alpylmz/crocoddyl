@@ -71,6 +71,7 @@ const BoxQPSolution& BoxQP::solve(const Eigen::MatrixXd& H,
                                   const Eigen::VectorXd& lb,
                                   const Eigen::VectorXd& ub,
                                   const Eigen::VectorXd& xinit) {
+  std::cout << "Running BoxQP" << std::endl;
   if (static_cast<std::size_t>(H.rows()) != nx_ ||
       static_cast<std::size_t>(H.cols()) != nx_) {
     throw_pretty("Invalid argument: "

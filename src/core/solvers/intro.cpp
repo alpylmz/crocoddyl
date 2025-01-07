@@ -75,6 +75,7 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
                         const std::size_t maxiter, const bool is_feasible,
                         const double init_reg) {
   START_PROFILER("SolverIntro::solve");
+  std::cout << "Running Intro" << std::endl;
   if (problem_->is_updated()) {
     resizeData();
     // we shouldn't come here
@@ -97,7 +98,7 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
   }
   //std::cout << "first init_xs size: " << init_xs.size() << std::endl; // always 0
   //std::cout << "second init_xs: " << init_xs[0].transpose() << std::endl; // seg fault because size is 0
-
+  // at this point also all xs_ elements are set to x0
 
 
   /*
@@ -117,9 +118,11 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
 
   was_feasible_ = false;
   if (zero_upsilon_) {
+    std::cout << "zero_upsilon is true in the beginning of solve" << std::endl;
     upsilon_ = 0.;
   }
   else{
+    std::cout << "zero_upsilon is false in the beginning of solve" << std::endl;
     if(upsilon_ != 0){
       std::cout << "Something going on, upsilon should be zero" << std::endl;
       std::cout << "upsilon_ = " << upsilon_ << std::endl;
@@ -137,9 +140,12 @@ bool SolverIntro::solve(const std::vector<Eigen::VectorXd>& init_xs,
     std::cout << "preg_ " << preg_ << std::endl;
     std::cout << "dreg_ " << dreg_ << std::endl;
     while (true) {
+      // first inner loop seems to be executed only once
       std::cout << "first inner loop" << std::endl;
       try {
+        std::cout << "calcDiff start" << std::endl;
         computeDirection(recalcDiff);
+        std::cout << "calcDiff end" << std::endl;
         // here, calcDiff works:
         /*
         integratedactionmodeleuler

@@ -126,6 +126,7 @@ void CostModelSumTpl<Scalar>::calc(const boost::shared_ptr<CostDataSum>& data,
       data->cost += m_i->weight * d_i->cost;
     }
   }
+  std::cout << "data->cost: " << data->cost << std::endl;
 }
 
 template <typename Scalar>

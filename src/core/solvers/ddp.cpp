@@ -47,6 +47,7 @@ bool SolverDDP::solve(const std::vector<Eigen::VectorXd>& init_xs,
                       const std::size_t maxiter, const bool is_feasible,
                       const double init_reg) {
   START_PROFILER("SolverDDP::solve");
+  std::cout << "Running SolverDDP::solve" << std::endl;
   if (problem_->is_updated()) {
     resizeData();
   }
@@ -133,9 +134,11 @@ bool SolverDDP::solve(const std::vector<Eigen::VectorXd>& init_xs,
   return false;
 }
 
+// intro.cpp's computeDirection calls this
 void SolverDDP::computeDirection(const bool recalcDiff) {
   START_PROFILER("SolverDDP::computeDirection");
   if (recalcDiff) {
+    // I assume recalcDiff is always true
     std::cout << "recalcDiff is true" << std::endl;
     calcDiff();
   }
@@ -204,14 +207,22 @@ void SolverDDP::resizeData() {
 }
 
 double SolverDDP::calcDiff() {
+  std::cout << "SolverDDP::calcDiff" << std::endl;
   START_PROFILER("SolverDDP::calcDiff");
   if (iter_ == 0) {
+    std::cout << "iter_ is 0, calling problem_->calc" << std::endl;
+    // TODO: Almost done with this, I just have constraints left
     problem_->calc(xs_, us_);
   }
+  else{
+    std::cout << "iter_ is not 0, passing" << std::endl;
+  }
+  std::cout << "calling problem_->calcDiff" << std::endl;
   cost_ = problem_->calcDiff(xs_, us_);
 
   // ffeas_ = computeDynamicFeasibility(); I believe this is not used?
   // gfeas_ = computeInequalityFeasibility();
+  std::cout << "computeEqualityFeasibility" << std::endl;
   hfeas_ = computeEqualityFeasibility(); // This is used in the solve function
   STOP_PROFILER("SolverDDP::calcDiff");
   return cost_;

@@ -43,6 +43,7 @@ bool SolverFDDP::solve(const std::vector<Eigen::VectorXd>& init_xs,
   was_feasible_ = false;
 
   bool recalcDiff = true;
+  std::cout << "Running FDDP" << std::endl;
   for (iter_ = 0; iter_ < maxiter; ++iter_) {
     while (true) {
       try {

@@ -188,6 +188,7 @@ double SolverAbstract::computeEqualityFeasibility() {
   return tmp_feas_;
 }
 
+// For my usage always the warm start is full
 void SolverAbstract::setCandidate(const std::vector<Eigen::VectorXd>& xs_warm,
                                   const std::vector<Eigen::VectorXd>& us_warm,
                                   bool is_feasible) {
@@ -234,12 +235,14 @@ void SolverAbstract::setCandidate(const std::vector<Eigen::VectorXd>& xs_warm,
   }
 
   if (us_warm.size() == 0) {
+    std::cout << "SetCandidate us_warm size is 0" << std::endl;
     for (std::size_t t = 0; t < T; ++t) {
       const boost::shared_ptr<ActionModelAbstract>& model = models[t];
       const std::size_t nu = model->get_nu();
       us_[t] = Eigen::VectorXd::Zero(nu);
     }
   } else {
+    std::cout << "SetCandidate us_warm size is not 0" << std::endl;
     if (us_warm.size() != T) {
       throw_pretty("Warm start control has wrong dimension, got "
                    << us_warm.size() << " expecting " << T);

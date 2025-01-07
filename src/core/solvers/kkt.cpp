@@ -37,6 +37,7 @@ bool SolverKKT::solve(const std::vector<Eigen::VectorXd>& init_xs,
                       const std::vector<Eigen::VectorXd>& init_us,
                       const std::size_t maxiter, const bool is_feasible,
                       const double) {
+  std::cout << "Running KKT" << std::endl;
   setCandidate(init_xs, init_us, is_feasible);
   bool recalc = true;
   for (iter_ = 0; iter_ < maxiter; ++iter_) {

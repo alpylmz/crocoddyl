@@ -28,6 +28,7 @@ bool SolverIpopt::solve(const std::vector<Eigen::VectorXd>& init_xs,
                         const std::vector<Eigen::VectorXd>& init_us,
                         const std::size_t maxiter, const bool is_feasible,
                         const double /*reg_init*/) {
+  std::cout << "Running Ipopt" << std::endl;
   setCandidate(init_xs, init_us, is_feasible);
   ipopt_iface_->set_xs(xs_);
   ipopt_iface_->set_us(us_);

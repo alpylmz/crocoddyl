@@ -163,6 +163,8 @@ ShootingProblemTpl<Scalar>::~ShootingProblemTpl() {}
 template <typename Scalar>
 Scalar ShootingProblemTpl<Scalar>::calc(const std::vector<VectorXs>& xs,
                                         const std::vector<VectorXs>& us) {
+
+  std::cout << "called ShootingProblemTpl<Scalar>::calc" << std::endl;
   if (xs.size() != T_ + 1) {
     throw_pretty("Invalid argument: "
                  << "xs has wrong dimension (it should be " +
@@ -174,6 +176,7 @@ Scalar ShootingProblemTpl<Scalar>::calc(const std::vector<VectorXs>& xs,
                         std::to_string(T_) + ")");
   }
   START_PROFILER("ShootingProblem::calc");
+  std::cout << "T_ is " << T_ << std::endl;
 
 #ifdef CROCODDYL_WITH_MULTITHREADING
 #pragma omp parallel for num_threads(nthreads_)
@@ -195,6 +198,7 @@ Scalar ShootingProblemTpl<Scalar>::calc(const std::vector<VectorXs>& xs,
   }
   cost_ += terminal_data_->cost;
   STOP_PROFILER("ShootingProblem::calc");
+  std::cout << "returning from ShootingProblemTpl<Scalar>::calc" << std::endl;
   return cost_;
 }
 

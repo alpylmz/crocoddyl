@@ -59,7 +59,9 @@ void ResidualModelFramePlacementTpl<Scalar>::calc(
   // Compute the frame placement w.r.t. the reference frame
   pinocchio::updateFramePlacement(*pin_model_.get(), *d->pinocchio, id_);
   d->rMf = oMf_inv_ * d->pinocchio->oMf[id_];
+  std::cout << "residualmodelframeplacementtpl d->rMf: " << d->rMf << std::endl;
   data->r = pinocchio::log6(d->rMf).toVector();
+  std::cout << "residualmodelframeplacementtpl data->r: " << data->r << std::endl;
 }
 
 template <typename Scalar>
